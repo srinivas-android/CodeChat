@@ -1,14 +1,24 @@
 package com.example.codechat.features.auth.login
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.codechat.core.utils.TokenManager
+import com.example.codechat.domain.usecase.LoginUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import javax.inject.Inject
 
-class LoginViewModel : ViewModel() {
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    private val loginUseCase: LoginUseCase,
+    private val tokenManager: TokenManager
+) : ViewModel() {
     var uiState by mutableStateOf(LoginUiState())
 
     fun onEmailChange(email: String) {
@@ -21,11 +31,11 @@ class LoginViewModel : ViewModel() {
 
     fun login() {
         if (uiState.email.isBlank()) {
-            uiState.copy(emailError = "Email is required")
+            uiState = uiState.copy(emailError = "Email is required")
             return
         }
         if (uiState.password.isBlank()) {
-            uiState.copy(passwordError = "Password is required")
+            uiState = uiState.copy(passwordError = "Password is required")
             return
         }
         uiState = uiState.copy(isLoading = true)
@@ -33,14 +43,25 @@ class LoginViewModel : ViewModel() {
         viewModelScope.launch {
             delay(1000)
 
-            if (uiState.email == "admin" && uiState.password == "password") {
+            try {
+                val result = loginUseCase(uiState.email, uiState.password)
+                tokenManager.saveToken(result.token.toString())
                 uiState = uiState.copy(isLoading = false, loginSuccess = true)
-            } else {
+            } catch (e: Exception) {
                 uiState = uiState.copy(
                     isLoading = false,
-                    loginErrorMessage = "Invalid credentials"
+                    loginErrorMessage = e.localizedMessage ?: "Invalid credentials"
                 )
             }
+
+//            if (uiState.email == "admin" && uiState.password == "password") {
+//                uiState = uiState.copy(isLoading = false, loginSuccess = true)
+//            } else {
+//                uiState = uiState.copy(
+//                    isLoading = false,
+//                    loginErrorMessage = "Invalid credentials"
+//                )
+//            }
         }
     }
 
