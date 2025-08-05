@@ -99,4 +99,7 @@ dependencies {
 // Compose Testing
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 
+//Compose
+    implementation(libs.coil.compose)
+
 }

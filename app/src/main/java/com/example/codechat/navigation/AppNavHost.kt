@@ -43,6 +43,10 @@ fun AppNavHost() {
             MainScreen()
         }
 
+        composable(Routes.PROFILE) {
+
+        }
+
         composable(Routes.HOME) {
 
         }
