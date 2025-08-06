@@ -54,6 +54,7 @@ dependencies {
     implementation(libs.androidx.compose.material.iconsCore)
     implementation(libs.androidx.compose.material.iconsExtended)
     implementation(libs.androidx.espresso.core)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -101,5 +102,7 @@ dependencies {
 
 //Compose
     implementation(libs.coil.compose)
+
+    implementation(libs.compose.runtime)
 
 }

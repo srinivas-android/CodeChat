@@ -11,6 +11,8 @@ import com.example.codechat.features.auth.login.LoginScreen
 import com.example.codechat.features.auth.login.LoginViewModel
 import com.example.codechat.features.auth.register.RegisterScreen
 import com.example.codechat.features.auth.register.RegisterViewModel
+import com.example.codechat.features.chat.ChatScreen
+import com.example.codechat.features.chat.ChatViewModel
 import com.example.codechat.features.main.MainScreen
 
 @Composable
@@ -23,7 +25,10 @@ fun AppNavHost() {
         composable(Routes.LOGIN) {
             val loginViewModel: LoginViewModel = hiltViewModel()
             LoginScreen(
-                onLoginSuccess = { navController.navigate(Routes.MAIN) },
+                onLoginSuccess = { navController.navigate(Routes.MAIN) {
+                    popUpTo(Routes.LOGIN) {inclusive = true}
+                    launchSingleTop = true
+                } },
                 onRegisterClick = { navController.navigate(Routes.REGISTER) },
                 viewModel = loginViewModel
             )
@@ -41,6 +46,11 @@ fun AppNavHost() {
 
         composable(Routes.MAIN) {
             MainScreen()
+        }
+
+        composable(Routes.CHAT) {
+            val chatViewModel: ChatViewModel = hiltViewModel()
+            ChatScreen(chatViewModel)
         }
 
         composable(Routes.PROFILE) {

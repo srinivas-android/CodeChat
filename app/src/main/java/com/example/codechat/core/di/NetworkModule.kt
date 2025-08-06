@@ -2,6 +2,8 @@ package com.example.codechat.core.di
 
 import com.example.codechat.core.network.AuthApiService
 import com.example.codechat.core.network.AuthInterceptor
+import com.example.codechat.core.network.ChatApiService
+import com.example.codechat.core.network.ProfileApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,5 +36,17 @@ object NetworkModule {
         return OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideChatApiService(retrofit: Retrofit): ChatApiService {
+        return retrofit.create(ChatApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideProfileApi(retrofit: Retrofit): ProfileApi {
+        return retrofit.create(ProfileApi::class.java)
     }
 }

@@ -1,6 +1,7 @@
 package com.example.codechat.domain.usecase
 
 import com.example.codechat.domain.model.User
+import com.example.codechat.domain.repository.AuthRepository // Added import
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent

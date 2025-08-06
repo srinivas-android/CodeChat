@@ -17,6 +17,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -35,9 +36,13 @@ fun LoginScreen(
 ){
     val state = viewModel.uiState
 
-    if(state.loginSuccess){
-        onLoginSuccess()
+
+    LaunchedEffect(state.loginSuccess) {
+        if(state.loginSuccess) {
+                onLoginSuccess()
+        }
     }
+
 
     Surface(modifier = Modifier.fillMaxSize()){
         Column(

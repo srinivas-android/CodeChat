@@ -1,8 +1,15 @@
 package com.example.codechat.core.di
 
+import com.example.codechat.core.network.AuthApiService
+import com.example.codechat.core.network.ChatApiService
 import com.example.codechat.core.network.ProfileApi
+import com.example.codechat.core.utils.TokenManager
+import com.example.codechat.data.repository.AuthRepositoryImpl
+import com.example.codechat.data.repository.ChatRepositoryImpl
 import com.example.codechat.data.repository.ProfileRepositoryImpl
-import com.example.codechat.domain.usecase.ProfileRepository
+import com.example.codechat.domain.repository.AuthRepository
+import com.example.codechat.domain.repository.ChatRepository
+import com.example.codechat.domain.repository.ProfileRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,7 +21,27 @@ import javax.inject.Singleton
 object RepositoryModule {
     @Provides
     @Singleton
-    fun provideProfileRepository(api: ProfileApi): ProfileRepository {
-        return ProfileRepositoryImpl(api)
+    fun provideAuthRepository(
+        api: AuthApiService,
+        tokenManager: TokenManager
+    ): AuthRepository {
+        return AuthRepositoryImpl(api, tokenManager)
+    }
+
+    @Provides
+    @Singleton
+    fun provideProfileRepository(
+        profileApi: ProfileApi,
+        authApiService: AuthApiService
+    ): ProfileRepository {
+        return ProfileRepositoryImpl(profileApi, authApiService)
+    }
+
+    @Provides
+    @Singleton
+    fun provideChatRepository(
+        chatApiService: ChatApiService
+    ): ChatRepository {
+        return ChatRepositoryImpl(chatApiService)
     }
 }

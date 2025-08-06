@@ -1,4 +1,4 @@
-package com.example.codechat.domain.usecase
+package com.example.codechat.domain.repository // Changed package
 
 import com.example.codechat.domain.model.User
 
