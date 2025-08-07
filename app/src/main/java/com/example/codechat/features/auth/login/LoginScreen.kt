@@ -2,12 +2,14 @@ package com.example.codechat.features.auth.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -52,11 +54,13 @@ fun LoginScreen(
         )
         {
             Image(painter = painterResource(id = R.drawable.code_chat),
-                contentDescription = "CodeChat Logo"
+                contentDescription = "CodeChat Logo",
+                Modifier.size(120.dp)
             )
+            Spacer(modifier = Modifier.height(16.dp))
             Text(text = "Sign in to CodeChat", style = MaterialTheme.typography.headlineMedium)
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             AuthTextField(
                 value = state.email,
@@ -79,9 +83,17 @@ fun LoginScreen(
                 errorMessage = state.passwordError
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Box(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
+                TextButton(onClick = { /*TODO*/ },
+                    modifier = Modifier.align(Alignment.CenterEnd)
+                ) {
+                    Text(
+                        text = "Forgot password?",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
 
-            Text(text = "Forgot password?", style = MaterialTheme.typography.bodyMedium)
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -92,6 +104,8 @@ fun LoginScreen(
             ) {
                 Text(if (state.isLoading) "Logging in..." else "Sign in")
             }
+
+            Spacer(modifier = Modifier.height(12.dp))
 
             TextButton(onClick = { onRegisterClick() }){
                 Text(text = "Don't have an account? Sign up")
