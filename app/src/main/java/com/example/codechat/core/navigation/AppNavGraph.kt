@@ -10,11 +10,14 @@ import com.example.codechat.features.profile.ProfileScreen
 
 @Composable
 fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier) {
-    NavHost(navController, startDestination = Routes.CHAT_LIST, modifier = modifier) { // Also applied the modifier parameter
+    NavHost(navController, startDestination = Routes.PROFILE, modifier = modifier) { // Also applied the modifier parameter
         composable(Routes.CHAT_LIST) {
             ChatListScreen( onChatRoomClick = { roomId ->
                 navController.navigate("chat_room/$roomId")
             })
+        }
+        composable(Routes.CHAT){
+
         }
         composable("contacts") {
             // TODO: Add your Contacts screen composable here
@@ -24,9 +27,9 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
         }
         composable("profile") {
             ProfileScreen(
-                onEditProfileClick = {
-                navController.navigate("edit_profile")
-                },
+//                onEditProfileClick = {
+//                navController.navigate("edit_profile")
+//                },
                 onUserClick = { user ->
                 navController.navigate("user_detail/${user.id}")
                 }

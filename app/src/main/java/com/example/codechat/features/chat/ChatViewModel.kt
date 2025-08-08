@@ -1,8 +1,12 @@
 package com.example.codechat.features.chat
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import javax.inject.Inject
 
-class ChatViewModel : ViewModel() {
+class ChatViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
+) : ViewModel() {
     var uiState = ChatUiState()
 
     fun sendMessage() {

@@ -13,11 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.codechat.core.navigation.BottomNavItem
+import com.example.codechat.core.navigation.Routes
 
 @Composable
 fun BottomNavBar(navController: NavHostController) {
     val items = listOf(
-        BottomNavItem("Chats", "chats", Icons.Default.Chat),
+        BottomNavItem("Chats", Routes.CHAT, Icons.Default.Chat),
         BottomNavItem("Contacts", "contacts", Icons.Default.Person),
         BottomNavItem("Profile", "profile", Icons.Default.AccountCircle)
     )

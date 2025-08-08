@@ -7,5 +7,7 @@ data class ProfileUiState(
     val userList: List<User> = emptyList(),
     val isLoading: Boolean = false,
     val isLoadingUsers: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val isUploadingImage: Boolean = false, // Added
+    val imageUploadError: String? = null    // Added
 )

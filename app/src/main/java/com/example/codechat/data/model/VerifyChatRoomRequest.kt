@@ -1,6 +1,9 @@
 package com.example.codechat.data.model
 
+
+import com.google.gson.annotations.SerializedName
+
 data class VerifyChatRoomRequest(
-    val userId: String // Or Int, ID of the other user to verify/create room with
-    // Add other relevant fields if needed by your API
+    @SerializedName("userId") val userId: String,
+    @SerializedName("chatUserId") val chatUserId: Int
 )

@@ -1,11 +1,12 @@
 package com.example.codechat.data.model
-
 import com.google.gson.annotations.SerializedName
 
-data class VerifyChatRoomResponse(
-    @SerializedName("id") val roomId: Int,
+data class ChatMessageDto(
+    @SerializedName("id") val id: Int,
+    @SerializedName("message") val message: String,
     @SerializedName("user_id") val userId: Int,
-    @SerializedName("chat_user_id") val chatUserId: Int,
+    @SerializedName("room_id") val roomId: Int,
+    @SerializedName("user") val user: UserDto?, // User who sent the message
     @SerializedName("created_at") val createdAt: String,
     @SerializedName("updated_at") val updatedAt: String
 )

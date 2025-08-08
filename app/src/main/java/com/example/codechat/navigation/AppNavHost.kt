@@ -3,9 +3,11 @@ package com.example.codechat.navigation
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.codechat.core.navigation.Routes
 import com.example.codechat.features.auth.login.LoginScreen
 import com.example.codechat.features.auth.login.LoginViewModel
@@ -48,7 +50,9 @@ fun AppNavHost() {
             MainScreen()
         }
 
-        composable(Routes.CHAT) {
+        composable(route = Routes.CHAT,
+            arguments = listOf(navArgument("userId") { type = NavType.StringType })
+        ) { backStackEntry ->
             val chatViewModel: ChatViewModel = hiltViewModel()
             ChatScreen(chatViewModel)
         }

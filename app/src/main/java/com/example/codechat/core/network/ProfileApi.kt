@@ -19,7 +19,7 @@ interface ProfileApi {
     @POST("update-profile-image")
     suspend fun updateProfileImage(
         @Part("id") userId: RequestBody,
-        @Part profile: MultipartBody.Part
+        @Part profileImage: MultipartBody.Part
     ): ProfileImageResponse
 
 }

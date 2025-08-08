@@ -1,5 +1,6 @@
 package com.example.codechat.core.di
 
+import android.content.Context
 import com.example.codechat.core.network.AuthApiService
 import com.example.codechat.core.network.ChatApiService
 import com.example.codechat.core.network.ProfileApi
@@ -13,6 +14,7 @@ import com.example.codechat.domain.repository.ProfileRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -32,16 +34,18 @@ object RepositoryModule {
     @Singleton
     fun provideProfileRepository(
         profileApi: ProfileApi,
-        authApiService: AuthApiService
+        authApiService: AuthApiService,
+        @ApplicationContext context: Context
     ): ProfileRepository {
-        return ProfileRepositoryImpl(profileApi, authApiService)
+        return ProfileRepositoryImpl(profileApi, authApiService, context)
     }
 
     @Provides
     @Singleton
     fun provideChatRepository(
-        chatApiService: ChatApiService
+        chatApiService: ChatApiService,
+        tokenManager: TokenManager
     ): ChatRepository {
-        return ChatRepositoryImpl(chatApiService)
+        return ChatRepositoryImpl(chatApiService,tokenManager)
     }
 }

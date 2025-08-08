@@ -7,5 +7,6 @@ data class Message(
     val senderName: String?, // Denormalized for convenience
     val content: String,
     val timestamp: Long, // Or String
-    val isSentByCurrentUser: Boolean = false // UI helper
+    val isSentByCurrentUser: Boolean = false, // UI helper
+    val senderProfileImage: String? // Denormalized for convenience
 )
