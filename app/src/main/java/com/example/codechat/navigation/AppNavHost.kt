@@ -22,7 +22,7 @@ fun AppNavHost() {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = "login"
+        startDestination = Routes.LOGIN
     ) {
         composable(Routes.LOGIN) {
             val loginViewModel: LoginViewModel = hiltViewModel()
@@ -48,13 +48,6 @@ fun AppNavHost() {
 
         composable(Routes.MAIN) {
             MainScreen()
-        }
-
-        composable(route = Routes.CHAT,
-            arguments = listOf(navArgument("userId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val chatViewModel: ChatViewModel = hiltViewModel()
-            ChatScreen(chatViewModel)
         }
 
         composable(Routes.PROFILE) {

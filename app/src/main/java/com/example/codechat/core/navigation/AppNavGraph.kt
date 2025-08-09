@@ -1,31 +1,64 @@
 package com.example.codechat.core.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import com.example.codechat.features.chat.ChatScreen
 import com.example.codechat.features.chatlist.ChatListScreen // Ensure this import is correct
+import com.example.codechat.features.main.MainViewModel
 import com.example.codechat.features.profile.ProfileScreen
 
 @Composable
-fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier) {
-    NavHost(navController, startDestination = Routes.PROFILE, modifier = modifier) { // Also applied the modifier parameter
+fun AppNavGraph(navController: NavHostController,
+                modifier: Modifier = Modifier
+) {
+    NavHost(navController,
+        startDestination = Routes.PROFILE,
+        modifier = modifier
+    ) { // Also applied the modifier parameter
         composable(Routes.CHAT_LIST) {
-            ChatListScreen( onChatRoomClick = { roomId ->
-                navController.navigate("chat_room/$roomId")
-            })
+            ChatListScreen(
+                onNavigateToChat = { roomId, _, _ ->
+                    navController.navigate("${Routes.CHAT_SCREEN_BASE}?${Routes.ARG_ROOM_ID}=${roomId}")
+                },
+                onNavigateToNewChatSelection = {
+                    navController.navigate(Routes.USER_SELECTION)
+                }
+            )
         }
-        composable(Routes.CHAT){
 
+        composable(
+            route = "${Routes.CHAT_SCREEN_BASE}?${Routes.ARG_ROOM_ID}={${Routes.ARG_ROOM_ID}}&${Routes.ARG_CHAT_USER_ID}={${Routes.ARG_CHAT_USER_ID}}",
+            arguments = listOf(
+                navArgument(Routes.ARG_ROOM_ID) {
+                    type = NavType.StringType
+                    nullable = true
+                },
+                navArgument(Routes.ARG_CHAT_USER_ID) {
+                    type = NavType.StringType
+                    nullable = true
+                }
+            )
+        ) {
+            ChatScreen(
+                onNavigateBack = { navController.popBackStack() }
+                // ChatViewModel will pick up roomId or chatUserId from SavedStateHandle
+            )
         }
+
         composable("contacts") {
             // TODO: Add your Contacts screen composable here
         }
         composable("settings") {
             // TODO: Add your Settings screen composable here
         }
-        composable("profile") {
+        composable(Routes.PROFILE) {
             ProfileScreen(
 //                onEditProfileClick = {
 //                navController.navigate("edit_profile")
@@ -38,8 +71,13 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
         composable("about") {
             // TODO: Add your About screen composable here
         }
-        composable("logout") {
-            // TODO: Handle logout logic and navigation
+
+        composable(Routes.LOGOUT) {
+            val mainViewModel: MainViewModel = hiltViewModel()
+            LaunchedEffect(Unit) {
+                mainViewModel.logout()
+            }
         }
+
     }
 }

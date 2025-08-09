@@ -54,7 +54,7 @@ class ChatRepositoryImpl @Inject constructor(
             name = this.name,
             email = this.email,
             profileImage = this.profileImage,
-            token = TODO()
+            token = null
             // 'isCurrentUser' can be determined in UseCase/ViewModel if needed,
             // or if currentUserId is passed here.
         )
@@ -80,7 +80,7 @@ class ChatRepositoryImpl @Inject constructor(
                 name = "Unknown User",
                 email = null,
                 profileImage = null,
-                token = TODO()
+                token = null
             )
 
         val lastMessageFromDto = this.chats?.maxByOrNull { parseTimestamp(it.createdAt) }
@@ -92,8 +92,8 @@ class ChatRepositoryImpl @Inject constructor(
             lastMessageTimestamp = lastMessageFromDto?.let { parseTimestamp(it.createdAt) },
             partnerUser = partner,
             unreadCount = 0,
-            participants = TODO(),
-            profileImageUrl = TODO(), // Placeholder, as not directly available in this DTO
+            participants =  listOfNotNull(partner),
+            profileImageUrl = partner.profileImage, // Placeholder, as not directly available in this DTO
         )
     }
 

@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.codechat.domain.usecase.GetUserChatRoomsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -15,7 +17,7 @@ class ChatListViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ChatListUiState())
-    val uiState = _uiState.asStateFlow()
+    val uiState: StateFlow<ChatListUiState> = _uiState.asStateFlow()
 
     init {
         fetchChatRooms()
@@ -23,16 +25,17 @@ class ChatListViewModel @Inject constructor(
 
     fun fetchChatRooms() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 val rooms = getUserChatRoomsUseCase()
-                _uiState.value = _uiState.value.copy(chatRooms = rooms, isLoading = false)
+                _uiState.update { it.copy(chatRooms = rooms, isLoading = false) }
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    errorMessage = e.message ?: "Failed to load chat rooms",
-                    isLoading = false
-                )
+                _uiState.update { it.copy(errorMessage = e.message ?: "Failed to load chat rooms", isLoading = false) }
             }
         }
+    }
+
+    fun onRefresh() {
+        fetchChatRooms()
     }
 }

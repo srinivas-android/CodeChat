@@ -4,6 +4,12 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
+    <uses-sdk
+        android:minSdkVersion="24"
+        android:targetSdkVersion="36"
+        tools:overrideLibrary="androidx.wear.compose.material.core" />
+
+
     <application
         android:allowBackup="true"
         android:name=".CodeChat"
