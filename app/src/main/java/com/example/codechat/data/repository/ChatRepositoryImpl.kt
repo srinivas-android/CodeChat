@@ -5,6 +5,7 @@ import com.example.codechat.core.network.ChatApiService
 import com.example.codechat.core.utils.TokenManager
 import com.example.codechat.data.model.ChatMessageDto
 import com.example.codechat.data.model.ChatRoomDto
+import com.example.codechat.data.model.MessageDto
 import com.example.codechat.data.model.SendMessageRequest
 import com.example.codechat.data.model.UserDto
 import com.example.codechat.data.model.UserRef
@@ -97,6 +98,19 @@ class ChatRepositoryImpl @Inject constructor(
         )
     }
 
+    private fun MessageDto.toDomain(currentLoggedInUserId: String): Message {
+        return Message(
+            id = this.id.toString(),
+            roomId = this.roomId.toString(),
+            senderId = this.userId.toString(),
+            content = this.message,
+            timestamp = parseTimestamp(this.createdAt), // Assuming MessageDto.createdAt is the correct field for timestamp
+            isSentByCurrentUser = this.userId.toString() == currentLoggedInUserId,
+            senderName = this.user.name, // Assuming MessageDto.user (UserDto) is non-nullable and has name
+            senderProfileImage = this.user.profileImage // Assuming MessageDto.user (UserDto) is non-nullable and has profileImage
+        )
+    }
+
 
     override suspend fun getUserChatRooms(): List<ChatRoom> {
         val currentUserId = tokenManager.getUserId() ?: throw IllegalStateException("User not logged in")
@@ -120,7 +134,7 @@ class ChatRepositoryImpl @Inject constructor(
             val roomChatsResponse = response.body()
             // The API response "get-room chats" seems to return a list of rooms,
             // we are interested in the chats of the *first* room in that list for the given roomId.
-            val messagesDtoList = roomChatsResponse?.rooms?.firstOrNull { it.id == roomIdInt }?.chats
+            val messagesDtoList = roomChatsResponse?.chats
             return messagesDtoList
                 ?.map { it.toDomain(currentUserId) }
                 ?.sortedBy { it.timestamp } // Sort by timestamp

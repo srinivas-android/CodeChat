@@ -13,6 +13,7 @@ import com.example.codechat.features.chat.ChatScreen
 import com.example.codechat.features.chatlist.ChatListScreen // Ensure this import is correct
 import com.example.codechat.features.main.MainViewModel
 import com.example.codechat.features.profile.ProfileScreen
+import com.example.codechat.features.userselection.UserSelectionScreen
 
 @Composable
 fun AppNavGraph(navController: NavHostController,
@@ -49,6 +50,18 @@ fun AppNavGraph(navController: NavHostController,
             ChatScreen(
                 onNavigateBack = { navController.popBackStack() }
                 // ChatViewModel will pick up roomId or chatUserId from SavedStateHandle
+            )
+        }
+
+        composable(Routes.USER_SELECTION)
+        {
+            UserSelectionScreen(
+                onUserSelected = { selectedUserId ->
+                    navController.navigate("${Routes.CHAT_SCREEN_BASE}?${Routes.ARG_CHAT_USER_ID}=$selectedUserId") {
+                        popUpTo(Routes.USER_SELECTION) { inclusive = true }
+                    }
+                },
+                onNavigateBack = { navController.popBackStack() }
             )
         }
 

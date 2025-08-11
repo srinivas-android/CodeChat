@@ -19,7 +19,7 @@ import com.example.codechat.core.navigation.Routes
 fun BottomNavBar(navController: NavHostController) {
     val items = listOf(
         BottomNavItem("Chats", Routes.CHAT_LIST, Icons.Default.Chat),
-        BottomNavItem("Contacts", Routes.CONTACTS, Icons.Default.Person),
+//        BottomNavItem("Contacts", Routes.CONTACTS, Icons.Default.Person),
         BottomNavItem("Profile", Routes.PROFILE, Icons.Default.AccountCircle)
     )
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route

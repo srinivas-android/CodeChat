@@ -1,5 +1,6 @@
 package com.example.codechat.features.chat
 
+import android.util.Log
 import androidx.activity.result.launch
 import androidx.compose.animation.core.copy
 import androidx.lifecycle.SavedStateHandle
@@ -8,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.codechat.domain.usecase.GetRoomMessagesUseCase
 import com.example.codechat.domain.usecase.SendMessageUseCase
 import com.example.codechat.domain.usecase.VerifyChatRoomUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,6 +17,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class ChatViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getRoomMessagesUseCase: GetRoomMessagesUseCase,
@@ -68,6 +71,7 @@ class ChatViewModel @Inject constructor(
                 _uiState.update { it.copy(isLoadingMessages = true, errorMessage = null) }
                 try {
                     val fetchedMessages = getRoomMessagesUseCase(roomId)
+                    Log.e("Chat Messages",fetchedMessages.toString())
                     _uiState.update {
                         it.copy(
                             isLoadingMessages = false,

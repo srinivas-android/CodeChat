@@ -28,15 +28,15 @@ fun ChatListScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
-//        topBar = {
-//            TopAppBar(
-//                title = { Text("Chats") },
-//                colors = TopAppBarDefaults.topAppBarColors(
-//                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-//                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-//                )
-//            )
-//        },
+        topBar = {
+            TopAppBar(
+                title = { Text("Chats") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = onNavigateToNewChatSelection) {
                 Icon(Icons.Filled.AddComment, contentDescription = "Start new chat")
@@ -121,8 +121,9 @@ fun ChatRoomItem(
             }
         },
         leadingContent = {
+            val imageUrl = chatRoom.profileImageUrl
             ProfileImage(
-                imageUrl = chatRoom.profileImageUrl,
+                imageUrl = if(imageUrl.isNullOrBlank()) null else imageUrl,
                 contentDescription = "${chatRoom.name} profile picture",
                 size = 40.dp
             )
