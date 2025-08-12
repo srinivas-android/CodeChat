@@ -68,7 +68,7 @@ class ChatRepositoryImpl @Inject constructor(
             senderId = this.userId.toString(),
             content = this.message,
             timestamp = parseTimestamp(this.createdAt),
-            isSentByCurrentUser = false,
+            isSentByCurrentUser = this.userId.toString() == currentUserId,
             senderName = this.user?.name,
             senderProfileImage = this.user?.profileImage // Assuming you add senderProfileImage
         )
