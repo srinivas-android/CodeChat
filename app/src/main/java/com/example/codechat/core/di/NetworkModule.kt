@@ -4,6 +4,7 @@ import com.example.codechat.core.network.AuthApiService
 import com.example.codechat.core.network.AuthInterceptor
 import com.example.codechat.core.network.ChatApiService
 import com.example.codechat.core.network.ProfileApi
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,7 +18,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
     @Provides
-    fun provideBaseUrl(): String = "http://192.168.1.6:8000/api/"
+    fun provideBaseUrl(): String = "http://10.40.90.154:8000/api/"
 
     @Provides
     @Singleton
@@ -48,5 +49,11 @@ object NetworkModule {
     @Singleton
     fun provideProfileApi(retrofit: Retrofit): ProfileApi {
         return retrofit.create(ProfileApi::class.java)
+    }
+
+    @Provides
+    @Singleton // Ensures only one instance of Gson is created and reused
+    fun provideGson(): Gson {
+        return Gson() // Or use GsonBuilder().create() if you need custom configurations
     }
 }

@@ -5,6 +5,7 @@ import com.example.codechat.core.network.AuthApiService
 import com.example.codechat.core.network.ChatApiService
 import com.example.codechat.core.network.ProfileApi
 import com.example.codechat.core.utils.TokenManager
+import com.example.codechat.data.remote.PusherService
 import com.example.codechat.data.repository.AuthRepositoryImpl
 import com.example.codechat.data.repository.ChatRepositoryImpl
 import com.example.codechat.data.repository.ProfileRepositoryImpl
@@ -44,8 +45,9 @@ object RepositoryModule {
     @Singleton
     fun provideChatRepository(
         chatApiService: ChatApiService,
-        tokenManager: TokenManager
+        tokenManager: TokenManager,
+        pusherService: PusherService
     ): ChatRepository {
-        return ChatRepositoryImpl(chatApiService,tokenManager)
+        return ChatRepositoryImpl(chatApiService,tokenManager,pusherService)
     }
 }

@@ -106,4 +106,9 @@ dependencies {
 
     implementation(libs.compose.runtime)
 
+// Pusher Java Client
+    implementation(libs.pusher.java.client)
+
+    implementation(libs.google.gson)
+
 }

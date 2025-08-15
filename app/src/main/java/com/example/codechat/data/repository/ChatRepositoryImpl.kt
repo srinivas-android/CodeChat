@@ -11,10 +11,12 @@ import com.example.codechat.data.model.UserDto
 import com.example.codechat.data.model.UserRef
 import com.example.codechat.data.model.VerifyChatRoomRequest
 import com.example.codechat.data.model.VerifyChatRoomResponse
+import com.example.codechat.data.remote.PusherService
 import com.example.codechat.domain.model.ChatRoom
 import com.example.codechat.domain.model.Message
 import com.example.codechat.domain.model.User
 import com.example.codechat.domain.repository.ChatRepository
+import kotlinx.coroutines.flow.SharedFlow
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
@@ -22,8 +24,13 @@ import javax.inject.Inject
 
 class ChatRepositoryImpl @Inject constructor(
     private val chatApiService: ChatApiService,
-    private val tokenManager: TokenManager
+    private val tokenManager: TokenManager,
+    private val pusherService: PusherService
 ) : ChatRepository {
+
+    init {
+        pusherService.connect()
+    }
 
     private val timestampParser = SimpleDateFormat(
         "yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'",
@@ -180,6 +187,24 @@ class ChatRepositoryImpl @Inject constructor(
         } else {
             throw Exception("Failed to send message: ${response.code()} ${response.message()}")
         }
+    }
+
+    override suspend fun getRealtimeMessages(): SharedFlow<MessageDto> {
+        return pusherService.incomingMessageEvents
+    }
+
+     override fun subscribeToRoom(roomId: String) {
+        // The event name must match what your Laravel backend broadcasts for new messages
+        // e.g., if you have `broadcast(new ChatMessageSent($message))->toOthers();`
+        // and ChatMessageSent event is not explicitly named, Laravel uses the class name.
+        // If App\Events\ChatMessageSent, then it might be ".App.Events.ChatMessageSent" or just "ChatMessageSent"
+        // Check your Echo configuration or broadcasting setup.
+        val messageEventName = "ChatMessageSent" // TODO: VERIFY THIS EVENT NAME
+        pusherService.subscribeToRoomChannel(roomId, messageEventName)
+    }
+
+    override fun unsubscribeFromRoom(roomId: String) {
+        pusherService.unsubscribeFromRoomChannel(roomId)
     }
 
 //    override suspend fun verifyChatRoom(userId: String): VerifyChatRoomResponse {
