@@ -34,7 +34,7 @@ class ProfileViewModel @Inject constructor(
             val userId = tokenManager.getUserId()
             uiState = uiState.copy(isLoading = true, errorMessage = null)
             try {
-                val profile = getMyProfileUseCase(userId = userId.toString()) // Ensure this matches your use case signature
+                val profile = getMyProfileUseCase(userId = userId.toString())
                 uiState = uiState.copy(loggedInUser = profile, isLoading = false)
             } catch (e: Exception) {
                 uiState = uiState.copy(errorMessage = e.message ?: "An unexpected error occurred", isLoading = false)
@@ -54,9 +54,7 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    // This function was from the original file, it locally updates the state.
-    // It might be redundant or serve a different purpose now.
-    // Consider if this is still needed or if updateProfileImage handles all image updates.
+
     fun onRefreshProfileImage(url: String) {
         val updatedUser = uiState.loggedInUser?.copy(profileImage = url)
         uiState = uiState.copy(loggedInUser = updatedUser)

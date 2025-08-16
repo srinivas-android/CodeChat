@@ -18,7 +18,6 @@ interface AuthApiService {
     @POST("register-user")
     suspend fun registerUser(@Body body: RegisterRequest): RegisterResponse
 
-    // New function for getting user profile
     @GET("user")
     suspend fun getMyProfile(@Query("id") id: String): User
 }

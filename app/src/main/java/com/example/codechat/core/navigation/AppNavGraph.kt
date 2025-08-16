@@ -22,7 +22,7 @@ fun AppNavGraph(navController: NavHostController,
     NavHost(navController,
         startDestination = Routes.PROFILE,
         modifier = modifier
-    ) { // Also applied the modifier parameter
+    ) {
         composable(Routes.CHAT_LIST) {
             ChatListScreen(
                 onNavigateToChat = { roomId, _, _ ->
@@ -49,7 +49,6 @@ fun AppNavGraph(navController: NavHostController,
         ) {
             ChatScreen(
                 onNavigateBack = { navController.popBackStack() }
-                // ChatViewModel will pick up roomId or chatUserId from SavedStateHandle
             )
         }
 

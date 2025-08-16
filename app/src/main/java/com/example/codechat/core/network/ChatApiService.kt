@@ -17,13 +17,11 @@ interface ChatApiService {
     @GET("get-user-chat-rooms")
     suspend fun getUserChatRooms(@Query("id") userId: String): Response<GetUserChatRoomsResponse>
 
-    // Assuming 'get-room-chats' takes roomId as a path parameter like /get-room-chats/{roomId}
-    // If it's a query parameter, use @Query("roomId") roomId: String
     @GET("get-room-chats")
     suspend fun getRoomMessages(@Query("id") roomId: Int): Response<GetRoomChatsResponse>
 
     @POST("send-message")
-    suspend fun sendMessage(@Body request: SendMessageRequest): Response<SendMessageResponse> // Assuming API returns the sent Message object
+    suspend fun sendMessage(@Body request: SendMessageRequest): Response<SendMessageResponse>
 
     @POST("verify-chat-room")
     suspend fun verifyChatRoom(@Body request: VerifyChatRoomRequest): Response<VerifyChatRoomResponse>

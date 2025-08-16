@@ -1,12 +1,12 @@
 package com.example.codechat.domain.model
 
 data class Message(
-    val id: String, // Or Int
-    val roomId: String, // Or Int
-    val senderId: String, // Or Int
-    val senderName: String?, // Denormalized for convenience
+    val id: String,
+    val roomId: String,
+    val senderId: String,
+    val senderName: String?,
     val content: String,
-    val timestamp: Long, // Or String
-    val isSentByCurrentUser: Boolean = false, // UI helper
-    val senderProfileImage: String? // Denormalized for convenience
+    val timestamp: Long,
+    val isSentByCurrentUser: Boolean = false,
+    val senderProfileImage: String?
 )

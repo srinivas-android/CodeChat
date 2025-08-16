@@ -49,8 +49,8 @@ fun ChatListScreen(
             onChatRoomClick = { chatRoom ->
                 onNavigateToChat(
                     chatRoom.id,
-                    chatRoom.partnerUser?.id.toString(), // Pass partnerUserId for context
-                    chatRoom.partnerUser?.name // Pass partnerName for context
+                    chatRoom.partnerUser?.id.toString(),
+                    chatRoom.partnerUser?.name
                 )
             },
             onRefresh = { viewModel.onRefresh() }
@@ -63,7 +63,7 @@ fun ChatListContent(
     modifier: Modifier = Modifier,
     uiState: ChatListUiState,
     onChatRoomClick: (ChatRoom) -> Unit,
-    onRefresh: () -> Unit // For swipe-to-refresh or a button
+    onRefresh: () -> Unit
 ) {
     Box(
         modifier = modifier.fillMaxSize(),
@@ -79,7 +79,7 @@ fun ChatListContent(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text("Error: ${uiState.errorMessage}", color = MaterialTheme.colorScheme.error)
-                    // You might add a retry button here that calls onRefresh
+
                 }
             }
             uiState.chatRooms.isEmpty() -> {
@@ -88,7 +88,7 @@ fun ChatListContent(
             else -> {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(vertical = 0.dp) // No padding if items have their own
+                    contentPadding = PaddingValues(vertical = 0.dp)
                 ) {
                     items(uiState.chatRooms, key = { it.id }) { chatRoom ->
                         ChatRoomItem(
@@ -100,7 +100,6 @@ fun ChatListContent(
                 }
             }
         }
-        // Add SwipeRefresh if desired
     }
 }
 
@@ -128,8 +127,6 @@ fun ChatRoomItem(
                 size = 40.dp
             )
         },
-        // Optionally, show unread count or last message timestamp as trailing content
-        // trailingContent = { Text(chatRoom.lastMessageTimestamp.toString()) },
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)

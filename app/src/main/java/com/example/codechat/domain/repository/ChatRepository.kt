@@ -11,7 +11,7 @@ interface ChatRepository {
     suspend fun getUserChatRooms(): List<ChatRoom>
     suspend fun getRoomMessages(roomId: String): List<Message>
     suspend fun sendMessage(roomId: String, messageContent: String): Message
-    suspend fun verifyChatRoom(userId: String): VerifyChatRoomResponse // Or return ChatRoom directly if preferred
+    suspend fun verifyChatRoom(userId: String): VerifyChatRoomResponse
 
     suspend fun getRealtimeMessages(): SharedFlow<MessageDto>
 

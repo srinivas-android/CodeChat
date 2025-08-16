@@ -1,11 +1,11 @@
 package com.example.codechat.data.repository
 
 import com.example.codechat.core.network.AuthApiService
-import com.example.codechat.core.utils.TokenManager // Import TokenManager
+import com.example.codechat.core.utils.TokenManager
 import com.example.codechat.data.model.LoginRequest
 import com.example.codechat.data.model.RegisterRequest
 import com.example.codechat.domain.model.User
-import com.example.codechat.domain.repository.AuthRepository // Changed import
+import com.example.codechat.domain.repository.AuthRepository
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(

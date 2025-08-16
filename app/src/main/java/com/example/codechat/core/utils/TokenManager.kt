@@ -23,7 +23,7 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
 @Singleton
 class TokenManager @Inject constructor(@ApplicationContext private val context: Context) {
     private val tokenDataStore: DataStore<Preferences> = context.dataStore
-    companion object { // Using companion object for keys is a common pattern
+    companion object {
         private val TOKEN_KEY = stringPreferencesKey("auth_token")
         private val USER_ID_KEY = stringPreferencesKey("user_id")
     }

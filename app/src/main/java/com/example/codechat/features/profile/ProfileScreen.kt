@@ -92,7 +92,7 @@ fun ProfileScreen(
             }) {
                 Icon(
                     imageVector = Icons.Filled.AddAPhoto,
-                    contentDescription = "Edit Profile" // Add to strings.xml
+                    contentDescription = "Edit Profile"
                 )
             }
         }

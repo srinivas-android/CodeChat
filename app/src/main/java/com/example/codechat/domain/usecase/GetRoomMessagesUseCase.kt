@@ -8,7 +8,6 @@ class GetRoomMessagesUseCase @Inject constructor(
     private val chatRepository: ChatRepository
 ) {
     suspend operator fun invoke(roomId: String): List<Message> {
-        // You might add validation for roomId here if needed
         return chatRepository.getRoomMessages(roomId)
     }
 }

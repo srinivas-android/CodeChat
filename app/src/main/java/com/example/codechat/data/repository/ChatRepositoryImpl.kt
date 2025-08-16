@@ -63,8 +63,6 @@ class ChatRepositoryImpl @Inject constructor(
             email = this.email,
             profileImage = this.profileImage,
             token = null
-            // 'isCurrentUser' can be determined in UseCase/ViewModel if needed,
-            // or if currentUserId is passed here.
         )
     }
 
@@ -77,7 +75,7 @@ class ChatRepositoryImpl @Inject constructor(
             timestamp = parseTimestamp(this.createdAt),
             isSentByCurrentUser = this.userId.toString() == currentUserId,
             senderName = this.user?.name,
-            senderProfileImage = this.user?.profileImage // Assuming you add senderProfileImage
+            senderProfileImage = this.user?.profileImage
         )
     }
 
@@ -101,7 +99,7 @@ class ChatRepositoryImpl @Inject constructor(
             partnerUser = partner,
             unreadCount = 0,
             participants =  listOfNotNull(partner),
-            profileImageUrl = partner.profileImage, // Placeholder, as not directly available in this DTO
+            profileImageUrl = partner.profileImage,
         )
     }
 
@@ -111,10 +109,10 @@ class ChatRepositoryImpl @Inject constructor(
             roomId = this.roomId.toString(),
             senderId = this.userId.toString(),
             content = this.message,
-            timestamp = parseTimestamp(this.createdAt), // Assuming MessageDto.createdAt is the correct field for timestamp
+            timestamp = parseTimestamp(this.createdAt),
             isSentByCurrentUser = this.userId.toString() == currentLoggedInUserId,
-            senderName = this.user.name, // Assuming MessageDto.user (UserDto) is non-nullable and has name
-            senderProfileImage = this.user.profileImage // Assuming MessageDto.user (UserDto) is non-nullable and has profileImage
+            senderName = this.user.name,
+            senderProfileImage = this.user.profileImage
         )
     }
 
@@ -127,7 +125,6 @@ class ChatRepositoryImpl @Inject constructor(
             val chatRoomsResponse = response.body()
             return chatRoomsResponse?.rooms?.map { it.toDomain(currentUserId) } ?: emptyList()
         } else {
-            // Handle error (e.g., throw an exception, return an error state)
             throw Exception("Failed to get user chat rooms: ${response.code()} ${response.message()}")
         }
     }
@@ -139,8 +136,6 @@ class ChatRepositoryImpl @Inject constructor(
 
         if (response.isSuccessful) {
             val roomChatsResponse = response.body()
-            // The API response "get-room chats" seems to return a list of rooms,
-            // we are interested in the chats of the *first* room in that list for the given roomId.
             val messagesDtoList = roomChatsResponse?.chats
             return messagesDtoList
                 ?.map { it.toDomain(currentUserId) }
@@ -194,11 +189,6 @@ class ChatRepositoryImpl @Inject constructor(
     }
 
      override fun subscribeToRoom(roomId: String) {
-        // The event name must match what your Laravel backend broadcasts for new messages
-        // e.g., if you have `broadcast(new ChatMessageSent($message))->toOthers();`
-        // and ChatMessageSent event is not explicitly named, Laravel uses the class name.
-        // If App\Events\ChatMessageSent, then it might be ".App.Events.ChatMessageSent" or just "ChatMessageSent"
-        // Check your Echo configuration or broadcasting setup.
         val messageEventName = "ChatMessageSent" // TODO: VERIFY THIS EVENT NAME
         pusherService.subscribeToRoomChannel(roomId, messageEventName)
     }

@@ -48,23 +48,17 @@ class ProfileRepositoryImpl @Inject constructor(
                 val fileBytes = stream.readBytes()
                 val mimeType = context.contentResolver.getType(profileImage)
                 val requestFile = fileBytes.toRequestBody(mimeType?.toMediaTypeOrNull())
-
-                // The part name "profileImage" MUST match the @Part name in the ProfileApi interface.
                 MultipartBody.Part.createFormData("profile", "profile_image.jpg", requestFile)
             }
         } catch (e: Exception) {
-            // Consider more specific logging, e.g., Timber.e(e, "Error creating file part from URI: $imageUri")
             throw IOException("Failed to prepare image for upload: ${e.message}", e)
         }
 
         // Call the API
         try {
             val response = profileApi.updateProfileImage(userIdRequestBody, filePart)
-            // Assuming ProfileImageResponse has a field like `newImageUrl` or similar
-            // Adjust this based on your actual ProfileImageResponse structure
             return response ?: throw IOException("Server did not return a new image URL.")
         } catch (e: Exception) {
-            // Log.e("ProfileRepository", "Error uploading profile image to server", e)
             throw IOException("Failed to upload image: ${e.message}", e)
         }
     }

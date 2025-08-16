@@ -27,7 +27,7 @@ import javax.inject.Singleton
 
 @Singleton
 class PusherService @Inject constructor(
-    private val tokenManager: TokenManager, // For auth if using private channels
+    private val tokenManager: TokenManager,
     private val gson: Gson
 ) {
     private var pusher: Pusher? = null
@@ -39,18 +39,15 @@ class PusherService @Inject constructor(
     private val serviceScope = CoroutineScope(Dispatchers.IO)
 
     companion object {
-        // --- CONFIGURATION ---
-        // These should ideally come from your build config or a constants file
-        private const val PUSHER_APP_KEY = "chatkey" // From backend .env
-        private const val PUSHER_APP_CLUSTER = "mt1"      // e.g., "mt1", "eu", "ap1" - check your backend config
-        private const val WS_HOST = "10.40.90.154" // For Android emulator to connect to localhost of host machine
+        private const val PUSHER_APP_KEY = "chatkey"
+        private const val PUSHER_APP_CLUSTER = "mt1"
+        private const val WS_HOST = "192.168.1.5" // For Android emulator to connect to localhost of host machine
         // private const val WS_HOST = "your_actual_domain.com" // For production
         private const val WS_PORT = 6001       // Default Laravel WebSockets port (NOT your HTTP port 8000)
         private const val USE_TLS = false      // For local development with ws://
         // private const val USE_TLS = true    // For production with wss://
 
-        // The auth endpoint on your Laravel backend for private/presence channels
-        private const val AUTH_ENDPOINT_URL = "http://$WS_HOST:8000/broadcasting/auth" // Adjust port if your HTTP is different
+        private const val AUTH_ENDPOINT_URL = "http://$WS_HOST:8000/broadcasting/auth"
     }
 
     fun connect() {
@@ -63,15 +60,14 @@ class PusherService @Inject constructor(
             setCluster(PUSHER_APP_CLUSTER)
             setHost(WS_HOST)
             setWsPort(WS_PORT)
-            setWssPort(WS_PORT) // Typically same as WsPort for TLS
+            setWssPort(WS_PORT)
             setUseTLS(USE_TLS)
+            setEncrypted(false)
 
-            // --- Authentication for Private Channels (VERY IMPORTANT) ---
-            // This is required if your Laravel channels are private (e.g., "private-chat.roomId")
+
             val authorizer = HttpAuthorizer(AUTH_ENDPOINT_URL)
             val headers = HashMap<String, String>()
-            // You MUST get the token synchronously here or ensure it's available.
-            // runBlocking is used for simplicity in this example but consider alternatives.
+
             headers["Accept"] = "application/json"
             authorizer.setHeaders(headers)
             setAuthorizer(authorizer)
@@ -94,12 +90,10 @@ class PusherService @Inject constructor(
     }
 
     fun subscribeToRoomChannel(roomId: String, eventName: String) {
-        val channelName = "chat_$roomId" // Standard for private Laravel Echo channels
-        // Or "chat.$roomId" if public. Adjust as per your backend.
+        val channelName = "chat_$roomId"
         if (pusher?.connection?.state != ConnectionState.CONNECTED) {
             Log.w("PusherService", "Pusher not connected. Cannot subscribe to $channelName.")
-            connect() // Attempt to connect if not already
-            // May need to queue subscription or handle this more gracefully
+            connect()
             return
         }
 
@@ -109,14 +103,11 @@ class PusherService @Inject constructor(
         }
 
         try {
-            val channel = pusher?.subscribe(channelName) // For public: subscribe(channelName)
+            val channel = pusher?.subscribe(channelName)
             channel?.bind(eventName, SubscriptionEventListener { event: PusherEvent ->
                 Log.i("PusherService", "Received event: ${event.eventName} on channel ${event.channelName} with data: ${event.data}")
                 try {
-                    // Laravel Echo often wraps the actual data.
-                    // You need to inspect event.data to see if it's the MessageDto JSON directly
-                    // or if it's nested, e.g., {"message": {...your MessageDto...}}
-                    // Assuming event.data IS the JSON string of your MessageDto:
+
 //                    val messageDto = gson.fromJson(event.data, MessageDto::class.java)
                     val wrapper = gson.fromJson(event.data, WebSocketMessageWrapper::class.java)
                     val messageDto = wrapper.chat

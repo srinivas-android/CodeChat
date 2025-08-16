@@ -17,8 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Send
-// import androidx.compose.material.icons.outlined.Info // Codechat specific - omit for now
-// import androidx.compose.material.icons.outlined.Search // Codechat specific - omit for now
+// import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,6 +34,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.wear.compose.material.ContentAlpha
 import coil.compose.AsyncImage
 import com.example.codechat.R // Assuming you have an R file
@@ -46,21 +46,21 @@ import java.util.Locale
 // Data class to represent a message in the UI, adapted from Codechat
 data class DisplayMessage(
     val id: String,
-    val author: String, // "Me" or Sender's Name
+    val author: String,
     val content: String,
-    val timestamp: String, // Formatted timestamp
-    val authorImageUrl: String?, // URL for Coil
+    val timestamp: String,
+    val authorImageUrl: String?,
     val isUserMe: Boolean,
-    val authorId: String? = null // To navigate to profile if needed
-    // val image: Int? = null, // For attached images from drawables (Codechat original)
-    // val imageData: Any? = null // For attached images from network/URI (Future)
+    val authorId: String? = null
+    // val image: Int? = null, (Codechat original)
+    // val imageData: Any? = null (Future)
 )
 
 // Simplified UiState for ConversationContent
 data class CodechatConversationUiState(
     val messages: List<DisplayMessage>,
     val channelName: String,
-    val channelMembers: Int, // You might not have this, pass a default
+    val channelMembers: Int,
     val currentMessageInput: String,
     val isSendingMessage: Boolean
 )
@@ -70,40 +70,66 @@ data class CodechatConversationUiState(
 fun ChatScreen(
     viewModel: ChatViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit,
-    navigateToProfile: (String) -> Unit = {} // Added for Codechat compatibility, can be no-op
+    navigateToProfile: (String) -> Unit = {}
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    // Transform ViewModel's UiState to CodechatConversationUiState
-    val codechatUiState = CodechatConversationUiState(
-        messages = uiState.messages.map { domainMessage ->
-            // You'll need to define R.string.author_me in your strings.xml
-            val authorMe = try { uiState.partnerUser?.name } catch (e: Exception) { "Me" }
+   Log.d("ChatScreen", "UI_STATE_COLLECTED: $uiState")
+
+        val codechatUiState = remember(uiState) {
+        CodechatConversationUiState(
+            messages = uiState.messages.map { domainMessage ->
+                val authorMe = try {
+                    uiState.partnerUser?.name
+                } catch (e: Exception) {
+                    "Me"
+                }
+                DisplayMessage(
+                    id = domainMessage.id,
+                    author = if (domainMessage.isSentByCurrentUser) authorMe.toString() else domainMessage.senderName
+                        ?: "Unknown User",
+                    content = domainMessage.content,
+                    timestamp = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(
+                        Date(
+                            domainMessage.timestamp
+                        )
+                    ),
+                    authorImageUrl = domainMessage.senderProfileImage,
+                    isUserMe = domainMessage.isSentByCurrentUser,
+                    authorId = domainMessage.senderId
+                )
+            }.reversed(),
+            channelName = uiState.navigationTitle,
+            channelMembers = 0, // Placeholder - Codechat UI shows this.
+            currentMessageInput = uiState.currentMessageInput,
+            isSendingMessage = uiState.isSendingMessage
+        )
+    }
+
+    val displayMessagesForLazyColumn = remember(uiState.messages) {
+        uiState.messages.map { domainMessage ->
+            val authorMe = uiState.partnerUser?.name ?: "Me"
             DisplayMessage(
                 id = domainMessage.id,
-                author = if (domainMessage.isSentByCurrentUser) authorMe.toString() else domainMessage.senderName ?: "Unknown User",
+                author = if (domainMessage.isSentByCurrentUser) authorMe else domainMessage.senderName ?: "Unknown User",
                 content = domainMessage.content,
                 timestamp = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date(domainMessage.timestamp)),
                 authorImageUrl = domainMessage.senderProfileImage,
                 isUserMe = domainMessage.isSentByCurrentUser,
                 authorId = domainMessage.senderId
             )
-        }.reversed(), // Codechat's LazyColumn is reversed
-        channelName = uiState.navigationTitle,
-        channelMembers = 0, // Placeholder - Codechat UI shows this.
-        currentMessageInput = uiState.currentMessageInput,
-        isSendingMessage = uiState.isSendingMessage
-    )
+        }.reversed()
+    }
+
 
     val scrollState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
-    // Scroll to bottom when new messages arrive (simplified from Codechat)
-    LaunchedEffect(codechatUiState.messages.size) {
+    LaunchedEffect(displayMessagesForLazyColumn.size) {
         if (codechatUiState.messages.isNotEmpty()) {
             scope.launch {
-                scrollState.animateScrollToItem(0) // Codechat is reversed, so 0 is the newest
+                scrollState.animateScrollToItem(0)
             }
         }
     }
@@ -149,7 +175,7 @@ fun ChatScreen(
                         }
                     }
                 }
-                // No specific "empty" state for messages, just shows an empty LazyColumn
+
                 else -> {
                     CodechatMessages(
                         messages = codechatUiState.messages,
@@ -206,9 +232,8 @@ fun CodechatChannelNameBar(
                     text = channelName,
                     style = MaterialTheme.typography.titleMedium
                 )
-                if (channelMembers > 0) { // Only show if relevant
+                if (channelMembers > 0) {
                     Text(
-                        // You'll need to define R.string.members in your strings.xml
                         text = "2",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -246,6 +271,12 @@ fun CodechatMessages(
     scrollState: LazyListState,
     modifier: Modifier = Modifier
 ) {
+
+    if (messages.isNotEmpty()) {
+        Log.d("CodechatMessages", "First message in list passed to LazyColumn: ID=${messages[0].id}, Content='${messages[0].content}'")
+    } else {
+        Log.d("CodechatMessages", "Messages list passed to LazyColumn is empty.")
+    }
     Box(modifier = modifier) {
         LazyColumn(
             reverseLayout = true, // Newest messages at the bottom, and scroll from bottom
@@ -254,15 +285,12 @@ fun CodechatMessages(
             contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp) // Spacing between messages
         ) {
-            // Codechat has more complex logic for grouping, first/last message by author, day headers.
-            // This is a simplified version.
             items(messages, key = { it.id }) { msg ->
                 CodechatMessageItem(
                     onAuthorClick = { authorId -> if (authorId != null) navigateToProfile(authorId) },
                     msg = msg,
                     isUserMe = msg.isUserMe,
-                    // For simplicity, we assume every message is "last" by author for avatar display
-                    // and "first" for top padding. True Codechat logic is more complex.
+
                     isFirstMessageByAuthor = true,
                     isLastMessageByAuthor = true
                 )
@@ -277,27 +305,25 @@ fun CodechatMessageItem(
     onAuthorClick: (String?) -> Unit,
     msg: DisplayMessage,
     isUserMe: Boolean,
-    isFirstMessageByAuthor: Boolean, // Used for spacing/timestamp in Codechat
-    isLastMessageByAuthor: Boolean  // Used for avatar display in Codechat
+    isFirstMessageByAuthor: Boolean,
+    isLastMessageByAuthor: Boolean
 ) {
     val borderColor = if (isUserMe) {
         MaterialTheme.colorScheme.primary
     } else {
-        MaterialTheme.colorScheme.tertiary // Ensure this color is defined in your theme
+        MaterialTheme.colorScheme.tertiary
     }
 
-    // Codechat's original "spaceBetweenAuthors" used Modifier.padding(top = 8.dp) for isLastMessageByAuthor.
-    // Simplified here.
     val rowModifier = if (isFirstMessageByAuthor) Modifier.padding(top = 8.dp) else Modifier
 
     Row(modifier = rowModifier.fillMaxWidth()) {
-        if (!isUserMe && isLastMessageByAuthor) { // Show avatar for received messages if it's the last one by them in a block
+        if (!isUserMe && isLastMessageByAuthor) {
             AsyncImage(
                 model = msg.authorImageUrl,
-                contentDescription = "${msg.author} profile picture",       // Create this placeholder
+                contentDescription = "${msg.author} profile picture",
                 modifier = Modifier
                     .clickable(onClick = { onAuthorClick(msg.authorId) })
-                    .padding(start = 4.dp, end = 8.dp) // Adjusted padding
+                    .padding(start = 4.dp, end = 8.dp)
                     .size(42.dp)
                     .border(1.5.dp, borderColor, CircleShape)
                     .border(3.dp, MaterialTheme.colorScheme.surface, CircleShape)
@@ -305,24 +331,23 @@ fun CodechatMessageItem(
                     .align(Alignment.Top)
             )
         } else if (isUserMe) {
-             Spacer(Modifier.weight(0.15f)) // Push user's messages to the right
+             Spacer(Modifier.weight(0.15f))
         } else {
-            // Space for avatar if not the last message by this author (or if avatar is hidden)
-            Spacer(modifier = Modifier.width(42.dp + 12.dp)) // Avatar size + padding
+            Spacer(modifier = Modifier.width(42.dp + 12.dp))
         }
 
         CodechatAuthorAndTextMessage(
             msg = msg,
             isUserMe = isUserMe,
-            isFirstMessageByAuthor = isFirstMessageByAuthor, // Pass for potential timestamp display
-            isLastMessageByAuthor = isLastMessageByAuthor,   // Pass for potential different styling
+            isFirstMessageByAuthor = isFirstMessageByAuthor,
+            isLastMessageByAuthor = isLastMessageByAuthor,
             authorClicked = { onAuthorClick(msg.authorId) },
             modifier = Modifier
-                .padding(end = if (isUserMe) 4.dp else 16.dp) // Adjusted padding
+                .padding(end = if (isUserMe) 4.dp else 16.dp)
                 .weight(if (isUserMe) 0.85f else 1f)
         )
          if (!isUserMe) {
-             Spacer(Modifier.weight(0.15f)) // Ensure received messages don't take full width if avatar is not shown
+             Spacer(Modifier.weight(0.15f))
         }
     }
 }
@@ -338,11 +363,10 @@ fun CodechatAuthorAndTextMessage(
 ) {
     val messageAlign = if (isUserMe) Alignment.End else Alignment.Start
     Column(modifier = modifier, horizontalAlignment = messageAlign) {
-        if (!isUserMe && isLastMessageByAuthor) { // Show author name for received messages if it's the last by them
+        if (!isUserMe && isLastMessageByAuthor) {
             CodechatAuthorNameTimestamp(msg)
         }
         CodechatChatItemBubble(msg, isUserMe, authorClicked = authorClicked)
-        // Spacing logic from Codechat, simplified:
         Spacer(modifier = Modifier.height(if (isFirstMessageByAuthor) 8.dp else 4.dp))
     }
 }
@@ -367,8 +391,6 @@ private fun CodechatAuthorNameTimestamp(msg: DisplayMessage) {
     }
 }
 
-// Codechat uses RoundedCornerShape(4.dp, 20.dp, 20.dp, 20.dp)
-// We'll use a more standard bubble shape for now
 private val ChatBubbleShapeMe = RoundedCornerShape(
     topStart = 16.dp,
     topEnd = 16.dp,
@@ -386,7 +408,7 @@ private val ChatBubbleShapeOther = RoundedCornerShape(
 fun CodechatChatItemBubble(
     message: DisplayMessage,
     isUserMe: Boolean,
-    authorClicked: (String?) -> Unit // Can be used for @mentions later
+    authorClicked: (String?) -> Unit
 ) {
     val backgroundBubbleColor = if (isUserMe) {
         MaterialTheme.colorScheme.primaryContainer
@@ -405,18 +427,17 @@ fun CodechatChatItemBubble(
         shape = bubbleShape,
         modifier = Modifier.padding(vertical = 2.dp)
     ) {
-        // Codechat has ClickableMessage with complex formatting. Simplified for now.
         Text(
             text = message.content,
             style = MaterialTheme.typography.bodyLarge.copy(color = textColor),
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
         )
-        // Attached image display (message.image from Codechat) can be added here later
+
     }
 }
 
 
-// Simplified UserInput, similar to your original MessageInputBar
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CodechatUserInput(
@@ -425,7 +446,7 @@ fun CodechatUserInput(
     onMessageChange: (String) -> Unit,
     onSendMessage: () -> Unit,
     isSending: Boolean,
-    resetScroll: () -> Unit // Codechat UserInput has this
+    resetScroll: () -> Unit
 ) {
     Row(
         modifier = modifier

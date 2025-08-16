@@ -8,6 +8,6 @@ data class ProfileUiState(
     val isLoading: Boolean = false,
     val isLoadingUsers: Boolean = false,
     val errorMessage: String? = null,
-    val isUploadingImage: Boolean = false, // Added
-    val imageUploadError: String? = null    // Added
+    val isUploadingImage: Boolean = false,
+    val imageUploadError: String? = null
 )
